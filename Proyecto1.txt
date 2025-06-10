@@ -1,0 +1,424 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <math.h>
+
+#define MAX_LIMIT 100.0f
+#define MIN_LIMIT -100.0f
+
+float aleatorios(float mini, float maxi) {
+    return mini + (float)rand() / RAND_MAX * (maxi - mini);
+}
+
+int opcion1(int *cant, float *mini, float *maxi) {
+    printf("Ingrese la cant. de num. aleatorios (entero): ");
+    scanf("%d", cant);
+    if (*cant <= 0) {
+        printf("La cant. debe ser > 0.\n");
+        return 0;
+    }
+
+    do {
+        printf("Ingrese el val. min. (Entre %.2f y %.2f): ", MIN_LIMIT, MAX_LIMIT);
+        scanf("%f", mini);
+        if (*mini < MIN_LIMIT || *mini > MAX_LIMIT) {
+            printf("Valor minimo fuera del rango permitido (%.2f a %.2f).\n", MIN_LIMIT, MAX_LIMIT);
+        }
+    } while (*mini < MIN_LIMIT || *mini > MAX_LIMIT);
+
+    do {
+        printf("Ingrese el val. max. (Entre %.2f y %.2f): ", MIN_LIMIT, MAX_LIMIT);
+        scanf("%f", maxi);
+        if (*maxi < MIN_LIMIT || *maxi > MAX_LIMIT) {
+            printf("Valor maximo fuera del rango permitido (%.2f a %.2f)..\n", MIN_LIMIT, MAX_LIMIT);
+        }
+    } while (*maxi < MIN_LIMIT || *maxi > MAX_LIMIT);
+
+    if (*mini > *maxi) {
+        printf("El val. min. no puede ser > al val. max.\n");
+        return 0;
+    }
+    return 1;
+}
+
+int numeros(int *cant) {
+    printf("Ingrese la cant. de num. a introducir (entero): ");
+    scanf("%d", cant);
+    if (*cant <= 0) {
+        printf("La cant. debe ser > 0.\n");
+        return 0;
+    }
+    return 1;
+}
+
+int ordenamiento(float *arre, int cant) {
+    if (!arre || cant <= 0) return 0;
+
+    int stack[100 * 2];
+    int top = -1;
+
+    stack[++top] = 0;
+    stack[++top] = cant - 1;
+
+    while (top >= 0) {
+        int alto = stack[top--];
+        int bajo = stack[top--];
+
+        float pivote = arre[alto];
+        int i = (bajo - 1);
+
+        for (int j = bajo; j <= alto - 1; j++) {
+            if (arre[j] < pivote) {
+                i++;
+                float temp = arre[i];
+                arre[i] = arre[j];
+                arre[j] = temp;
+            }
+        }
+        float temp = arre[i + 1];
+        arre[i + 1] = arre[alto];
+        arre[alto] = temp;
+
+        int pi = (i + 1);
+
+        if (pi - 1 > bajo) {
+            stack[++top] = bajo;
+            stack[++top] = pi - 1;
+        }
+
+        if (pi + 1 < alto) {
+            stack[++top] = pi + 1;
+            stack[++top] = alto;
+        }
+    }
+    return 1;
+}
+
+float* ImprimirA(int cant, float mini, float maxi) {
+    float *nume = (float *)malloc(cant * sizeof(float));
+    if (!nume) {
+        printf("Error: No se pudo asignar mem.\n");
+        return NULL;
+    }
+    srand(time(NULL));
+    printf("Numeros decimales generados:\n");
+    for (int i = 0; i < cant; i++) {
+        nume[i] = aleatorios(mini, maxi);
+        printf("%.5f \n", nume[i]); 
+    }
+    printf("\n");
+    return nume;
+}
+
+float* opcion2(int cant) {
+    float *nume = (float *)malloc(cant * sizeof(float));
+    if (!nume) {
+        printf("Error: No se pudo asignar mem.\n");
+        return NULL;
+    }
+    printf("Ingrese los %d numeros decimales (Entre %.2f y %.2f):\n", cant, MIN_LIMIT, MAX_LIMIT);
+    for (int i = 0; i < cant; i++) {
+        do {
+            printf("Numero %d: ", i + 1);
+            scanf("%f", &nume[i]);
+            if (nume[i] < MIN_LIMIT || nume[i] > MAX_LIMIT) {
+                printf("Numero fuera del rango permitido (%.2f a %.2f). Intente de nuevo.\n", MIN_LIMIT, MAX_LIMIT);
+            }
+        } while (nume[i] < MIN_LIMIT || nume[i] > MAX_LIMIT);
+    }
+    printf("\n");
+    return nume;
+}
+
+int* historial(float *arre, int cant, int min, int max) {
+    if (min > max) return NULL;
+    int tamano = max - min + 1;
+    int *hist = (int *)calloc(tamano, sizeof(int));
+    if (!hist) return NULL;
+    for (int i = 0; i < cant; i++) {
+        int intervalo = (int)arre[i];
+        if (intervalo >= min && intervalo <= max) {
+            int indice = intervalo - min;
+            hist[indice]++;
+        }
+    }
+    return hist;
+}
+
+float mediaa(float *arre, int cant){
+    float media = 0;
+    if (cant == 0) return 0.0f;
+    for (int i = 0; i < cant; i++) {
+        media += arre[i];
+    }
+    return media / cant;
+}
+
+float mediana(float *arre, int cant){
+    if (cant == 0) return 0.0f;
+    return (cant % 2 == 0) ? (arre[cant / 2 - 1] + arre[cant / 2]) / 2.0f : arre[cant / 2];
+}
+
+double mediag(float *arre, int cant, int *out_num_negativos){
+    *out_num_negativos = 0; 
+    if (cant == 0) {
+        return -HUGE_VAL;
+    }
+
+    int tiene_cero = 0;
+
+    for (int i = 0; i < cant; i++) {
+        if (arre[i] == 0.0f) {
+            tiene_cero = 1;
+            break; 
+        }
+        if (arre[i] < 0.0f) {
+            (*out_num_negativos)++;
+        }
+    }
+
+    if (tiene_cero) {
+        printf("Advertencia: La media geometrica es 0 si se encuentra un cero en los datos.\n");
+        return 0.0;
+    }
+
+    double producto = 1.0;
+    for (int i = 0; i < cant; i++) {
+        producto *= (arre[i] < 0.0f) ? (double)arre[i] * -1.0 : (double)arre[i];
+    }
+
+    return pow(producto, 1.0 / cant);
+}
+
+float moda(int *hist, int min, int max){
+    if (!hist || (max - min + 1) <= 0) return 0.0f;
+    int max_f = 0;
+    int moda_val = min;
+    for (int i = 0; i <= (max - min); i++) {
+        if (hist[i] > max_f) {
+            max_f = hist[i];
+            moda_val = min + i;
+        }
+    }
+    return (float)moda_val;
+}
+
+float obtener_cuantil(float *arre, int cant, int i, int divisor) {
+    if (!arre || cant <= 0 || i <= 0 || i > divisor) return 0.0f;
+    double posicion = (double)i * cant / divisor;
+    int indice_0_base = (int)ceil(posicion) - 1;
+    if (indice_0_base < 0) indice_0_base = 0;
+    if (indice_0_base >= cant) indice_0_base = cant - 1;
+    return arre[indice_0_base];
+}
+
+void imprimir_cuantiles(float *arre, int cant) {
+    if (cant <= 0) {
+        printf("\nNo se pueden calcular cuantiles para un arreglo vacio.\n");
+        return;
+    }
+    printf("\n--- Cuartiles ---\n");
+    printf("Cuartil 1 (Q1): %.8f\n", obtener_cuantil(arre, cant, 1, 4));
+    printf("Cuartil 2 (Q2): %.8f\n", mediana(arre, cant));
+    printf("Cuartil 3 (Q3): %.8f\n", obtener_cuantil(arre, cant, 3, 4));
+    printf("\n--- Deciles ---\n");
+    for (int i = 1; i <= 10; i++) {
+        printf("Decil %d (D%d%s): %.8f\n", i, i, (i == 5 ? " - Mediana" : ""), (i == 5 ? mediana(arre, cant) : obtener_cuantil(arre, cant, i, 10)));
+    }
+    printf("\n--- Percentiles ---\n");
+    for (int i = 10; i <= 100; i += 10) {
+        printf("Percentil %d (P%d%s): %.8f\n", i, i, (i == 50 ? " " : ""), (i == 50 ? mediana(arre, cant) : obtener_cuantil(arre, cant, i, 100)));
+    }
+}
+
+void momento(float *arre, int cant){
+    if (cant <= 0) {
+        printf("No se pueden calcular momentos para un arreglo vacio.\n");
+        return;
+    }
+
+    double media_calc = (double)mediaa(arre, cant);
+
+    double sum_diff2 = 0.0;
+    double sum_diff3 = 0.0;
+    double sum_diff4 = 0.0;
+
+    double m[4] = {0.0}; 
+
+    for (int i = 0; i < cant; i++) {
+        double valor_actual = (double)arre[i];
+        double diff = valor_actual - media_calc; 
+
+        m[0] += valor_actual;
+        m[1] += pow(valor_actual, 2);
+        m[2] += pow(valor_actual, 3);
+        m[3] += pow(valor_actual, 4);
+
+        sum_diff2 += pow(diff, 2);
+        sum_diff3 += pow(diff, 3);
+        sum_diff4 += pow(diff, 4);
+    }
+
+    double a[4];
+    a[0] = m[0] / cant;
+    a[1] = m[1] / cant;
+    a[2] = m[2] / cant;
+    a[3] = m[3] / cant;
+
+    printf("\n--- Momentos (respecto al origen) ---\n");
+    printf("Momento 0: %.8f\n", 1.0);
+    printf("Momento 1: %.8f\n", a[0]);
+    printf("Momento 2: %.8f\n", a[1]);
+    printf("Momento 3: %.8f\n", a[2]);
+    printf("Momento 4: %.8f\n", a[3]);
+
+    double c[5];
+    c[0] = 1.0;
+    c[1] = 0.0; 
+    c[2] = sum_diff2 / cant; 
+    c[3] = sum_diff3 / cant; 
+    c[4] = sum_diff4 / cant; 
+
+    printf("\n--- Momentos Centrales (respecto a la media) ---\n");
+    printf("Momento 0: %.8f\n", c[0]);
+    printf("Momento 1: %.8f\n", c[1]);
+    printf("Momento 2: %.8f\n", c[2]);
+    printf("Momento 3: %.8f\n", c[3]);
+    printf("Momento 4: %.8f\n", c[4]);
+
+    float varianza_muestral = (cant > 1) ? (float)sum_diff2 / (cant) : 0.0f;
+    printf("\nVarianza: %.8f\n", varianza_muestral);
+    float desviacion_estandar = sqrt(varianza_muestral);
+    printf("Desviacion estandar: %.8f\n", desviacion_estandar);
+
+    double desviacion_estandar_d = (double)desviacion_estandar;
+
+    printf("\n--- Momentos Estándar ---\n");
+    printf("Momento Estandar (k=1): %.8f\n", 0.0);
+
+    double momento_estandar_2;
+    if (desviacion_estandar_d != 0.0) {
+        momento_estandar_2 = c[2] / pow(desviacion_estandar_d, 2);
+    } else {
+        momento_estandar_2 = 0.0; 
+    }
+    printf("Momento Estandar (k=2): %.8f\n", momento_estandar_2);
+
+    double momento_estandar_3;
+    if (desviacion_estandar_d != 0.0) {
+        momento_estandar_3 = c[3] / pow(desviacion_estandar_d, 3);
+    } else {
+        momento_estandar_3 = 0.0;
+    }
+    printf("Momento Estandar (k=3): %.8f\n", momento_estandar_3);
+
+    double momento_estandar_4;
+    if (desviacion_estandar_d != 0.0) {
+        momento_estandar_4 = c[4] / pow(desviacion_estandar_d, 4);
+    } else {
+        momento_estandar_4 = 0.0;
+    }
+    double curtosis = momento_estandar_4 / pow(desviacion_estandar, 4); 
+    printf("Momento Estandar (k=4): %.8f\n", momento_estandar_4);
+    printf("Curtosis: %.8f\n", momento_estandar_4);
+}
+
+int resumen(float re_may, float re_men, int *hist, int mini_hist, int maxi_hist, int cant, float *arre) {
+    printf("\n--- Resumen ---\n");
+    printf("Numeros ordenados:\n");
+    for (int i = 0; i < cant; i++) printf("%.5f \n", arre[i]);
+    printf("\nEl numero mayor: %.8f\n", re_may);
+    printf("El numero menor: %.8f\n", re_men);
+
+    float media_calculada = mediaa(arre, cant);
+    printf("Media: %.8f\n", media_calculada);
+    printf("Mediana: %.8f\n", mediana(arre, cant));
+
+    int num_negativos_en_mediag;
+    double media_geom_val = mediag(arre, cant, &num_negativos_en_mediag);
+    if (media_geom_val == -HUGE_VAL) {
+        printf("Media Geom.: No aplicable (valores problematicos)\n");
+    } 
+    else if (media_geom_val == 0.0) {
+        printf("Media Geom.: %.8f\n", media_geom_val);
+    } 
+    else if (num_negativos_en_mediag % 2 != 0) {
+        printf("Media Geom.: %.8fi\n", media_geom_val); 
+    } 
+    else {
+        printf("Media Geom.: %.8f\n", media_geom_val);
+    }
+
+    printf("Moda: %.1f\n", moda(hist, mini_hist, maxi_hist));
+
+    imprimir_cuantiles(arre, cant);
+    momento(arre, cant); 
+
+    if (hist) {
+        printf("\n--- Histograma (partes enteras) ---\n");
+        for (int i = 0; i <= (maxi_hist - mini_hist); i++) {
+            if (hist[i] > 0) printf("h(%d): %d\n", mini_hist + i, hist[i]);
+        }
+        return 1;
+    } else {
+        printf("\nNo se pudo generar el histograma.\n");
+        return 0;
+    }
+}
+
+int main() {
+    int opci, cant;
+    float mini, maxi, re_may, re_men;
+    float *arr_num = NULL;
+    int *hist_res = NULL;
+    int mini_hist = 0, maxi_hist = 0;
+
+    printf("Elija una opcion:\n");
+    printf("1. Numeros aleatorios\n");
+    printf("2. Introducir numeros manualmente\n");
+    printf("Opcion: ");
+    scanf("%d", &opci);
+    printf("\n");
+
+    if (opci == 1) {
+        if (!opcion1(&cant, &mini, &maxi)) return 1;
+        printf("\n");
+        arr_num = ImprimirA(cant, mini, maxi);
+    } else if (opci == 2) {
+        if (!numeros(&cant)) return 1;
+        printf("\n");
+        arr_num = opcion2(cant);
+    } else {
+        printf("Opcion invalida.\n");
+        return 1;
+    }
+
+    if (!arr_num || cant <= 0) {
+        if (arr_num) free(arr_num);
+        return 1;
+    }
+
+    if (!ordenamiento(arr_num, cant)) {
+        printf("Error al ordenar el arreglo.\n");
+        free(arr_num);
+        return 1;
+    }
+
+    re_men = arr_num[0];
+    re_may = arr_num[cant - 1];
+    mini_hist = (int)re_men;
+    maxi_hist = (int)re_may;
+
+    if (mini_hist < MIN_LIMIT) mini_hist = (int)MIN_LIMIT;
+    if (maxi_hist > MAX_LIMIT) maxi_hist = (int)MAX_LIMIT;
+    if (mini_hist > maxi_hist) maxi_hist = mini_hist; 
+
+    hist_res = historial(arr_num, cant, mini_hist, maxi_hist);
+    resumen(re_may, re_men, hist_res, mini_hist, maxi_hist, cant, arr_num);
+
+    free(arr_num);
+    if (hist_res) {
+        free(hist_res);
+    }
+    return 0;
+}
