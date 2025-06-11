@@ -462,6 +462,6 @@ int main() {
     if (hist_res) {
         free(hist_res);
     }
-    printf("Tiempo de ejecución: %.2fs\n", (double)(clock() - tStart)/CLOCKS_PER_SEC);
+    printf("Tiempo de ejecucion: %.2fs\n", (double)(clock() - tStart)/CLOCKS_PER_SEC);
     return 0;
 }
