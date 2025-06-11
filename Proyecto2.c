@@ -1,15 +1,17 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
+#include <stdio.h>  //Librería de entrada y salida de datos estandar//
+#include <stdlib.h> //Librería estandar para generar numeros aleatorios en distribución uniforme//
+#include <time.h>   //Librería para usar el tiempo como semilla de los numeros aleatorios y medir el tiempo de ejecución//
 #include <math.h> // Necesario para funciones como sqrt, pow, HUGE_VALF, floorf, ceilf, isnan, isinf, fabs, log, exp
 
 #define MAX_LIMIT 100.0f
 #define MIN_LIMIT -100.0f
 
+//Generar un numero aleatorio//
 float aleatorios(float mini, float maxi) {
     return mini + (float)rand() / RAND_MAX * (maxi - mini);
 }
 
+//Generar datos aleatoriamente en un intervalo//
 int opcion1(int *cant, float *mini, float *maxi) {
     printf("Ingrese la cant. de num. aleatorios (entero): ");
     scanf("%d", cant);
@@ -41,6 +43,7 @@ int opcion1(int *cant, float *mini, float *maxi) {
     return 1;
 }
 
+//Solicitar la cantidad de datos a ingresar//
 int numeros(int *cant) {
     printf("Ingrese la cant. de num. a introducir (entero): ");
     scanf("%d", cant);
@@ -51,6 +54,7 @@ int numeros(int *cant) {
     return 1;
 }
 
+//Ordenamiento de muestras mediante Quick Sort//
 int ordenamiento(float *arre, int cant) {
     if (!arre || cant <= 0) return 0;
 
@@ -94,8 +98,10 @@ int ordenamiento(float *arre, int cant) {
     return 1;
 }
 
+//Imprimir los numeros generados aleatoriamente//
 float* ImprimirA(int cant, float mini, float maxi) {
     float *nume = (float *)malloc(cant * sizeof(float));
+    //Caso de error//
     if (!nume) {
         printf("Error: No se pudo asignar mem.\n");
         return NULL;
@@ -110,6 +116,7 @@ float* ImprimirA(int cant, float mini, float maxi) {
     return nume;
 }
 
+//Captura manual de datos//
 float* opcion2(int cant) {
     float *nume = (float *)malloc(cant * sizeof(float));
     if (!nume) {
@@ -148,6 +155,7 @@ int* historial(float *arre, int cant, int min, int max) {
     return hist;
 }
 
+//Media aritmetica//
 float mediaa(float *arre, int cant){
     float media = 0;
     if (cant == 0) return 0.0f;
@@ -157,12 +165,13 @@ float mediaa(float *arre, int cant){
     return media / cant;
 }
 
+//Mediana//
 float mediana(float *arre, int cant){
     if (cant == 0) return 0.0f;
     return (cant % 2 == 0) ? (arre[cant / 2 - 1] + arre[cant / 2]) / 2.0f : arre[cant / 2];
 }
 
-// Función mediag mejorada utilizando logaritmos
+// Función media geometrica mejorada utilizando logaritmos
 double mediag(float *arre, int cant, int *out_num_negativos, int *out_contiene_cero){
     *out_num_negativos = 0; 
     *out_contiene_cero = 0; 
@@ -184,13 +193,13 @@ double mediag(float *arre, int cant, int *out_num_negativos, int *out_contiene_c
         sum_logs += log(fabs((double)arre[i])); 
     }
     
-    // El resultado es exp(suma de logaritmos / cantidad de números)
     double resultado = exp(sum_logs / cant);
 
-    // Devolvemos el valor real; out_num_negativos se usa para señalar 'i' en la impresión.
+    // Devolver el valor real; out_num_negativos se usa para señalar 'i' en la impresión.
     return resultado;
 }
 
+//Moda de los datos//
 float moda(int *hist, int min, int max){
     if (!hist || (max - min + 1) <= 0) return HUGE_VALF; // Usar HUGE_VALF para indicar que no hay moda válida
 
@@ -211,6 +220,7 @@ float moda(int *hist, int min, int max){
     return moda_val_float;
 }
 
+//Función general para obtener cuantiles//
 float obtener_cuantil(float *arre, int cant, int i, int divisor) {
     if (!arre || cant <= 0 || i <= 0 || i > divisor) return 0.0f;
     double posicion = (double)i * cant / divisor;
@@ -220,6 +230,7 @@ float obtener_cuantil(float *arre, int cant, int i, int divisor) {
     return arre[indice_0_base];
 }
 
+//Función para mostrar los cuantiles de manera ordenada//
 void imprimir_cuantiles(float *arre, int cant) {
     if (cant <= 0) {
         printf("\nNo se pueden calcular cuantiles para un arreglo vacio.\n");
@@ -239,6 +250,7 @@ void imprimir_cuantiles(float *arre, int cant) {
     }
 }
 
+//Funcion para obtener los momentos de diferentes ordenes//
 void momento(float *arre, int cant){
     if (cant <= 0) {
         printf("No se pueden calcular momentos para un arreglo vacio.\n");
@@ -253,6 +265,7 @@ void momento(float *arre, int cant){
 
     double m[4] = {0.0};    
 
+    //Respecto al origen//
     for (int i = 0; i < cant; i++) {
         double valor_actual = (double)arre[i];
         double diff = valor_actual - media_calc; 
@@ -280,6 +293,7 @@ void momento(float *arre, int cant){
     printf("Momento 3: %.8f\n", a[2]);
     printf("Momento 4: %.8f\n", a[3]);
 
+    //Respecto a la media//
     double c[5];
     c[0] = 1.0;
     c[1] = 0.0; 
@@ -340,6 +354,7 @@ void momento(float *arre, int cant){
     printf("Curtosis: %.8f\n", momento_estandar_4);
 }
 
+//Mostar un resumen de los resultados//
 int resumen(float re_may, float re_men, int *hist, int mini_hist, int maxi_hist, int cant, float *arre) {
     printf("\n--- Resumen ---\n");
     printf("Numeros ordenados:\n");
@@ -358,7 +373,7 @@ int resumen(float re_may, float re_men, int *hist, int mini_hist, int maxi_hist,
     if (contiene_cero_en_mediag) {
         printf("Media Geom.: 0.00000000\n"); // Imprimir 0 si se encontró un cero
     } else if (isnan(media_geom_val)) {
-        printf("Media Geom.: N/A (no aplicable)\n"); // Si es NAN (ej. array vacío)
+        printf("Media Geom.: N/A (no aplicable)\n"); // Si es NAN
     } else if (num_negativos_en_mediag % 2 != 0) {
         printf("Media Geom.: %.8fi\n", media_geom_val); 
     } else {
@@ -389,12 +404,14 @@ int resumen(float re_may, float re_men, int *hist, int mini_hist, int maxi_hist,
 }
 
 int main() {
+    //Declarar variables//
     int opci, cant;
     float mini, maxi, re_may, re_men;
     float *arr_num = NULL;
     int *hist_res = NULL;
     int mini_hist = 0, maxi_hist = 0;
 
+    //Solicitar al usuario elegir entre captura manual y generacion aleatoria de valores//
     printf("Elija una opcion:\n");
     printf("1. Numeros aleatorios\n");
     printf("2. Introducir numeros manualmente\n");
@@ -414,7 +431,8 @@ int main() {
         printf("Opcion invalida.\n");
         return 1;
     }
-
+    clock_t tStart = clock();
+    //Casos de error//
     if (!arr_num || cant <= 0) {
         if (arr_num) free(arr_num);
         return 1;
@@ -444,5 +462,6 @@ int main() {
     if (hist_res) {
         free(hist_res);
     }
+    printf("Tiempo de ejecución: %.2fs\n", (double)(clock() - tStart)/CLOCKS_PER_SEC);
     return 0;
 }

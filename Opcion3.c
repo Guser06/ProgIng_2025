@@ -1,18 +1,16 @@
 #include <stdio.h>  //Librería de entrada y salida de datos estandar//
-#include <stdlib.h> //Librería estandar para generar numeros aleatorios en distribución uniforme//
-#include <time.h>   //Librería para usar el tiempo como semilla de los numeros aleatorios//
+#include <stdlib.h> 
+#include <time.h>   
 #include <math.h>   //Librería con funciones matemáticas utilizadas como potencias y raices//
 
 #define NUM_EJECUCIONES_OPCION3 20
 #define MAX_CANT_ALEATORIOS 10000
 
-//Generar un numero aleatorio//
 float aleatorios(float mini, float maxi) {
     if (mini >= maxi) return mini;
     return mini + (float)rand() / RAND_MAX * (maxi - mini);
 }
 
-//Ordenamiento de muestras mediante Quick Sort//
 int ordenamiento(float *arre, int cant) {
     if (!arre || cant <= 0) return 0;
 
@@ -56,7 +54,6 @@ int ordenamiento(float *arre, int cant) {
     return 1;
 }
 
-//Generar una cantidad n de numeros aleatorios en un intervalo//
 float* GenerarAleatorios(int cant, float mini, float maxi) {
     float *nume = (float *)malloc(cant * sizeof(float));
     if (!nume) {
@@ -353,6 +350,7 @@ void resumen_a_csv(FILE *fp, float re_may, float re_men, float mini_range_gen, f
 
 //Programa principal//
 int main() {
+    //Declaración de variables//
     int cant;
     float mini_gen, maxi_gen, re_may, re_men;
     float *arr_num = NULL;
@@ -463,6 +461,9 @@ int main() {
     //Cerrar el archivo//
     fclose(fp);
     printf("\nResultados guardados en 'resultados.csv'\n");
+
+    //Finalizar contaje de tiempo de ejecución//
+    printf("Tiempo: %.2fs\n", (double)(clock() - tStart)/CLOCKS_PER_SEC);
 
     //Finalizar el programa//
     return 0;
