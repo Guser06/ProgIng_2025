@@ -1,7 +1,7 @@
 #include <stdio.h>  //Librería de entrada y salida de datos estandar//
-#include <stdlib.h> 
-#include <time.h>   
-#include <math.h>   //Librería con funciones matemáticas utilizadas como potencias y raices//
+#include <stdlib.h>
+#include <time.h>   //Librería con funciones matemáticas utilizadas como potencias y raices//
+#include <math.h>
 
 #define NUM_EJECUCIONES_OPCION3 20
 #define MAX_CANT_ALEATORIOS 10000
@@ -262,7 +262,7 @@ void calcular_momentos(float *arre, int cant,
 
 //Funcion para escribir los resultados obtenidos en un archivo CSV//
 void resumen_a_csv(FILE *fp, float re_may, float re_men, float mini_range_gen, float maxi_range_gen,
-                       int *hist, int mini_hist, int maxi_hist, int cant, float *arre, int iteracion, int is_header_row) {
+                       int *hist, int mini_hist, int maxi_hist, int cant, float *arre, int iteracion, int is_header_row, double tiempo_exec) {
 
     double mom_origen_1, mom_origen_2, mom_origen_3, mom_origen_4;
     double mom_central_2, mom_central_3, mom_central_4;
@@ -287,7 +287,8 @@ void resumen_a_csv(FILE *fp, float re_may, float re_men, float mini_range_gen, f
                         "Momento_Estandar_2,Momento_Estandar_3,Momento_Estandar_4,Curtosis,"
                         "Cuartil_1,Cuartil_2,Cuartil_3,"
                         "Decil_1,Decil_2,Decil_3,Decil_4,Decil_5,Decil_6,Decil_7,Decil_8,Decil_9,Decil_10,"
-                        "Percentil_10,Percentil_20,Percentil_30,Percentil_40,Percentil_50,Percentil_60,Percentil_70,Percentil_80,Percentil_90,Percentil_100\n");
+                        "Percentil_10,Percentil_20,Percentil_30,Percentil_40,Percentil_50,Percentil_60,Percentil_70,Percentil_80,Percentil_90,Percentil_100,"
+                        "Tiempo_Ejecucion_s\n");
     } else {
         //Nombrar columnas//
         fprintf(fp, "%d,%d,%.2f,%.2f,", iteracion, cant, mini_range_gen, maxi_range_gen);
@@ -344,7 +345,9 @@ void resumen_a_csv(FILE *fp, float re_may, float re_men, float mini_range_gen, f
         for (int i = 10; i <= 100; i += 10) {
             fprintf(fp, ",%.6f", obtener_cuantil(arre, cant, i, 100));
         }
-        fprintf(fp, "\n");
+        
+        //Impresión del tiempo de ejecución//
+        fprintf(fp, ",%.6f\n", tiempo_exec);
     }
 }
 
@@ -356,6 +359,10 @@ int main() {
     float *arr_num = NULL;
     int *hist_res = NULL;
     int mini_hist = 0, maxi_hist = 0;
+    
+    //Declaración de variables para el cronómetro.
+    clock_t start_time, end_time;
+    double elapsed_time;
 
     //Semilla de numeros aleatorios//
     srand(time(NULL));
@@ -371,10 +378,14 @@ int main() {
     }
 
     //Colocar las medidas estadisticas en el csv//
-    resumen_a_csv(fp, 0, 0, 0.0f, 0.0f, NULL, 0, 0, 0, NULL, 0, 1);
+    resumen_a_csv(fp, 0, 0, 0.0f, 0.0f, NULL, 0, 0, 0, NULL, 0, 1, 0.0);
 
     //Ejecutar el programa para los 20 casos solicitados//
     for (int i = 1; i <= NUM_EJECUCIONES_OPCION3; i++) {
+        
+        //Inicia el cronómetro para la iteración actual.
+        start_time = clock();
+
         int factor = (rand() % (MAX_CANT_ALEATORIOS / 100)) + 1;
         cant = factor * 100;
 
@@ -448,8 +459,12 @@ int main() {
             continue;
         }
 
+        //Detener el cronómetro y calcular el tiempo transcurrido.
+        end_time = clock();
+        elapsed_time = (double)(end_time - start_time) / CLOCKS_PER_SEC;
+
         //Incorporar los resultados al csv//
-        resumen_a_csv(fp, re_may, re_men, mini_gen, maxi_gen, hist_res, mini_hist, maxi_hist, cant, arr_num, i, 0);
+        resumen_a_csv(fp, re_may, re_men, mini_gen, maxi_gen, hist_res, mini_hist, maxi_hist, cant, arr_num, i, 0, elapsed_time);
 
         //Liberar memoria utilizada en el almacenamiento de las muestras//
         free(arr_num);
