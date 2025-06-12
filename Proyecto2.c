@@ -324,7 +324,7 @@ void momento(float *arre, int cant){
 
     double desviacion_estandar_d = (double)desviacion_estandar;
 
-    printf("\n--- Momentos Estándar ---\n");
+    printf("\n--- Momentos Estandar ---\n");
     printf("Momento Estandar (k=1): %.8f\n", 0.0);
 
     double momento_estandar_2;
@@ -341,7 +341,7 @@ void momento(float *arre, int cant){
     } else {
         momento_estandar_3 = 0.0;
     }
-    printf("Momento Estandar (k=3 - Asimetría): %.8f\n", momento_estandar_3);
+    printf("Momento Estandar (k=3 - Asimetria): %.8f\n", momento_estandar_3);
 
     double momento_estandar_4;
     if (desviacion_estandar_d != 0.0) {
